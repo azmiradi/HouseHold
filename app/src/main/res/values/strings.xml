@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">HouseHold</string>
+
+    <string name="money">MONEY</string>
+    <string name="management">MANAGEMENT</string>
+    <string name="username">Username</string>
+    <string name="email">Email</string>
+    <string name="your_salary">Your salary</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="sign_up">SIGN UP</string>
+    <string name="login">SIGN IN</string>
+    <string name="loading">Loading....</string>
+    <string name="set_categories">Set categories</string>
+    <string name="monthly_report">Monthly report</string>
+    <string name="when_reiche">When I reach this amount of expenses,</string>
+    <string name="notifiy">Notify me.</string>
+    <string name="confirm">Confirm</string>
+    <string name="what_did_spend">What did you spend from your salary, today?</string>
+    <string name="add">ADD</string>
+    <string name="categories">Categories</string>
+    <string name="category_name">Category name</string>
+    <string name="add_category">Add Category</string>
+    <string name="select_category">Select category</string>
+    <string name="total">Total</string>
+    <string name="logout">Logout</string>
+    <string name="warning">Warning:</string>
+    <string name="expenses_that_exceed">Expenses that exceed the safe limit</string>
+    <string name="select_month">"Select Month "</string>
+    <string name="all_spend">All Spend Report</string>
+    <string name="comprehensive_report">Comprehensive report</string>
+    <string name="mobile">Mobile</string>
+    <string name="login_as_a_user">LOGIN AS A USER</string>
+    <string name="login_as_admin">LOGIN AS ADMIN</string>
+    <string name="my_orders">My Orders</string>
+    <string name="orders">Orders</string>
+    <string name="add_new_category">Add new category</string>
+    <string name="add_sub_category">Add Sub-category</string>
+</resources>

@@ -36,4 +36,8 @@
     <string name="orders">Orders</string>
     <string name="add_new_category">Add new category</string>
     <string name="add_sub_category">Add Sub-category</string>
+    <string name="add_product">Add product</string>
+    <string name="product_name">Product name</string>
+    <string name="dicription">Dicription</string>
+    <string name="price">Price</string>
 </resources>

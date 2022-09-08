@@ -87,5 +87,7 @@ dependencies {
 
     implementation 'com.rollbar:rollbar-java:1.+'
     implementation 'com.rollbar:rollbar-android:1.+@aar'
+    implementation("io.coil-kt:coil-compose:2.2.1")
+    implementation("com.himanshoe:pluck:1.0.0-RC2")
 
 }

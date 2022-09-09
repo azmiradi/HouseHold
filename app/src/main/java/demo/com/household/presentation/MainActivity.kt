@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.google.accompanist.insets.ProvideWindowInsets
 import dagger.hilt.android.AndroidEntryPoint
-import demo.com.household.presentation.NavHostManagement
+import demo.com.household.presentation.share_componennt.NavHostManagement
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

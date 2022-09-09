@@ -5,11 +5,10 @@ enum class NavigationDestination(val destination: String) {
     Login("login"),
     Signup("signup"),
     Home("home"),
-    Categories("categories"),
-    AddSpend("addSpend"),
-    MonthlyReport("monthlyReport"),
-    WarningMoney("warningMoney"),
-    AllSpend("allSpend"),
-
+    AddProduct("add_product"),
+    Cart("cart"),
+    MyOrders("myOrders"),
+    Purchase("purchase"),
+    SubCategory("sub_category"),
 
 }

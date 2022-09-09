@@ -14,9 +14,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import demo.com.household.R
+import demo.com.household.data.AccountType
+import demo.com.household.data.Constants
 import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.main.admin.main.MainAdminScreen
-import demo.com.household.presentation.screens.main.user.home.add_product.AddProduct
+import demo.com.household.presentation.screens.main.admin.add_product.AddProduct
 import demo.com.household.ui.theme.BrinkPink
 import demo.com.household.ui.theme.CharlestonGreen
 import kotlinx.coroutines.launch
@@ -41,8 +43,10 @@ fun HomeScreen(
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
-            //MainAdminScreen(onNavigate = {}, onBack = {})
-            AddProduct()
+            if (Constants.accountType == AccountType.Admin) {
+                MainAdminScreen(onNavigate = onNavigate, onBack = onBack)
+            }
+
         }
     }
 }
@@ -75,10 +79,14 @@ fun TopBar(scaffoldState: ScaffoldState, onNavigate: (NavigationDestination) -> 
         )
 
         IconButton(onClick = {
-            //  onNavigate(N)
+            if (Constants.accountType == AccountType.Admin)
+                onNavigate(NavigationDestination.AddProduct)
         }) {
             Icon(
-                painter = painterResource(id = R.drawable.add), "",
+                painter = if (Constants.accountType == AccountType.Admin)
+                    painterResource(id = R.drawable.add)
+                else
+                    painterResource(id = R.drawable.cart), "",
                 tint = Color.White
             )
         }

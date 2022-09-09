@@ -1,4 +1,4 @@
-package demo.com.household.presentation
+package demo.com.household.presentation.share_componennt
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background

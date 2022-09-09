@@ -88,6 +88,12 @@ dependencies {
     implementation 'com.rollbar:rollbar-java:1.+'
     implementation 'com.rollbar:rollbar-android:1.+@aar'
     implementation("io.coil-kt:coil-compose:2.2.1")
-    implementation("com.himanshoe:pluck:1.0.0-RC2")
+
+    implementation "com.google.accompanist:accompanist-permissions:0.24.2-alpha"
+
+
+    implementation "com.google.firebase:firebase-storage-ktx"
+    //Play Services
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1"
 
 }

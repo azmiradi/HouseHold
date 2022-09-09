@@ -7,6 +7,6 @@ object Constants {
     const val  SubCategoriesChild = "sub_categories"
     const val  RequestsChild = "requests"
     const val  ProductsChild = "products"
-    var accountType:AccountType?=null
+    var accountType:AccountType?=AccountType.Admin
 
 }

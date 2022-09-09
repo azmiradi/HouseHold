@@ -1,21 +1,22 @@
 package demo.com.household.presentation.screens.main.admin.main
 
+import android.Manifest
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,26 +26,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import demo.com.household.R
 import demo.com.household.data.Category
 import demo.com.household.data.SubCategory
-import demo.com.household.presentation.CustomTextInput
 import demo.com.household.presentation.NavigationDestination
-import demo.com.household.presentation.ProgressBar
-import demo.com.household.presentation.SampleSpinner
+import demo.com.household.presentation.share_componennt.*
 import demo.com.household.ui.theme.BrinkPink
 import demo.com.household.ui.theme.CharlestonGreen
 import demo.com.household.ui.theme.ChineseSliver
 import demo.com.household.ui.theme.ChineseSliver2
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainAdminScreen(
     onNavigate: (NavigationDestination) -> Unit,
     viewModel: MainAdminViewModel = hiltViewModel(),
     onBack: () -> Unit,
 ) {
+    val imageUri = "android.resource://demo.com.household/drawable/add_image"
+
+    val selectedImage =
+        remember {
+            mutableStateOf(imageUri.toUri())
+        }
+
+
+    var pickImage by
+    remember {
+        mutableStateOf(false)
+    }
+
     val categories = remember {
         mutableStateOf(listOf<Category>())
     }
@@ -67,6 +79,7 @@ fun MainAdminScreen(
         viewModel.resetState()
         onBack()
     }
+
 
     Column(
         Modifier
@@ -154,12 +167,19 @@ fun MainAdminScreen(
         )
         Spacer(modifier = Modifier.height(10.dp))
 
+        ImageItems(selectedImage.value) {
+            pickImage = true
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Button(
             onClick = {
                 viewModel.addSubCategory(
                     SubCategory(
                         name = subCategoryName.value,
-                        categoryID = selectedCategory.value
+                        categoryID = selectedCategory.value,
+                        image = selectedImage.value.toString()
                     )
                 )
             },
@@ -191,6 +211,24 @@ fun MainAdminScreen(
 
     //Handel Resonances
     HandelResonances()
+
+
+    val galleryLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+            if (it != null) {
+                selectedImage.value = it
+            }
+            pickImage = false
+        }
+
+    if (pickImage) {
+        UIRequirePermissions(permissions = arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+            onPermissionGranted = {
+                galleryLauncher.launch("image/*")
+            })
+    }
+
+
 }
 
 @Composable

@@ -40,4 +40,5 @@
     <string name="product_name">Product name</string>
     <string name="dicription">Dicription</string>
     <string name="price">Price</string>
+    <string name="select_sub_category">Select Sub Category</string>
 </resources>

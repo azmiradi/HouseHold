@@ -1,12 +1,14 @@
-package demo.com.household.presentation
+package demo.com.household.presentation.share_componennt
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.auth.login.LoginScreen
 import demo.com.household.presentation.screens.auth.signup.SignupScreen
 import demo.com.household.presentation.screens.auth.splash.SplashScreen
+import demo.com.household.presentation.screens.main.admin.add_product.AddProduct
 import demo.com.household.presentation.screens.main.user.home.HomeScreen
 
 @Composable
@@ -56,13 +58,13 @@ fun NavHostManagement() {
                 navController.popBackStack()
             })
         }
-//        composable(NavigationDestination.Categories.destination) {
-//            CategoriesScreen(onNavigate = {
-//                navController.navigate(it.destination)
-//            }, onBack = {
-//                navController.popBackStack()
-//            })
-//        }
+        composable(NavigationDestination.AddProduct.destination) {
+            AddProduct(onNavigate = {
+                navController.navigate(it.destination)
+            }, onBack = {
+                navController.popBackStack()
+            })
+        }
 //        composable(NavigationDestination.AddSpend.destination) {
 //            AddSpendScreen(onNavigate = {
 //                navController.navigate(it.destination)

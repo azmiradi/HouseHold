@@ -1,4 +1,4 @@
-//package demo.com.household.presentation
+package demo.com.household.presentation.share_componennt//package demo.com.household.presentation
 //
 //import androidx.compose.foundation.Image
 //import androidx.compose.foundation.layout.*

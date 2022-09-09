@@ -23,10 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import demo.com.household.presentation.CustomTextInput
+import demo.com.household.presentation.share_componennt.CustomTextInput
 import demo.com.household.presentation.NavigationDestination
-import demo.com.household.presentation.ProgressBar
-import demo.com.household.presentation.TextInputsPassword
+import demo.com.household.presentation.share_componennt.ProgressBar
+import demo.com.household.presentation.share_componennt.TextInputsPassword
 import demo.com.household.R
 import demo.com.household.ui.theme.BrinkPink
 import demo.com.household.ui.theme.CharlestonGreen

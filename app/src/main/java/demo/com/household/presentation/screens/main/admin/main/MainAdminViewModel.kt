@@ -1,24 +1,29 @@
 package demo.com.household.presentation.screens.main.admin.main
 
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import demo.com.household.presentation.DataState
 import com.demo.preferences.general.GeneralGeneralPrefsStoreImpl
 import com.google.firebase.database.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import demo.com.household.Resource
 import demo.com.household.data.*
 import demo.com.household.data.Constants.CategoriesChild
 import demo.com.household.data.Constants.SubCategoriesChild
-import demo.com.household.data.Constants.accountType
+import demo.com.household.domain.use_cases.UploadFirebaseImageUseCase
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
 class MainAdminViewModel @Inject constructor(
-    private val generalGeneralPrefsStoreImpl: GeneralGeneralPrefsStoreImpl
+    private val generalGeneralPrefsStoreImpl: GeneralGeneralPrefsStoreImpl,
+    private val uploadFirebaseImageUseCase: UploadFirebaseImageUseCase
 ) : ViewModel() {
 
     private var databaseReference: DatabaseReference =
@@ -42,6 +47,9 @@ class MainAdminViewModel @Inject constructor(
 
     private val _categorySelected = mutableStateOf(false)
     val categorySelected: State<Boolean> = _categorySelected
+
+    private val _subCategoryImage = mutableStateOf(false)
+    val subCategoryImage: State<Boolean> = _subCategoryImage
 
     init {
         getCategories()
@@ -89,27 +97,36 @@ class MainAdminViewModel @Inject constructor(
 
     fun addSubCategory(subCategory: SubCategory) {
         if (subCategory.name.isNullOrEmpty() ||
-            subCategory.categoryID.isNullOrEmpty()) {
+            subCategory.categoryID.isNullOrEmpty() ||
+            subCategory.image.isNullOrEmpty()
+        ) {
             _subCategoryName.value = subCategory.name.isNullOrEmpty()
-            _categorySelected.value =subCategory.categoryID.isNullOrEmpty()
-
+            _categorySelected.value = subCategory.categoryID.isNullOrEmpty()
+            _subCategoryImage.value = subCategory.image.isNullOrEmpty()
             return
         }
         _stateAddSubCategory.value = DataState(isLoading = true)
         val subCategoryID = databaseReference.child(CategoriesChild).push().key
         subCategory.id = subCategoryID
-        databaseReference.child(CategoriesChild)
-            .child(subCategory.categoryID.toString())
-            .child(SubCategoriesChild)
-            .child(subCategoryID.toString())
-            .setValue(subCategory)
-            .addOnSuccessListener {
-                _stateAddSubCategory.value = DataState(data = true)
-            }
-            .addOnFailureListener {
-                _stateAddSubCategory.value = DataState(error = it.message.toString())
-            }
+
+        uploadImage(subCategory.image.toString().toUri()) {
+            subCategory.image = it
+            databaseReference.child(CategoriesChild)
+                .child(subCategory.categoryID.toString())
+                .child(SubCategoriesChild)
+                .child(subCategoryID.toString())
+                .setValue(subCategory)
+                .addOnSuccessListener {
+                    _stateAddSubCategory.value = DataState(data = true)
+                }
+                .addOnFailureListener {
+                    _stateAddSubCategory.value = DataState(error = it.message.toString())
+                }
+        }
+
     }
+
+    private var jobUpload: Job? = null
 
     fun resetState() {
         _categoryName.value = false
@@ -118,7 +135,26 @@ class MainAdminViewModel @Inject constructor(
         _stateAddSubCategory.value = DataState()
         _stateCategories.value = DataState()
         job?.cancel()
+        jobUpload?.cancel()
     }
 
+
+    private fun uploadImage(
+        image: Uri,
+        imageUploaded: (String) -> Unit
+    ) {
+        jobUpload?.cancel()
+        jobUpload = uploadFirebaseImageUseCase(image).onEach {
+            when (it) {
+                is Resource.Success -> {
+                    imageUploaded(it.data.toString())
+                }
+                is Resource.Error -> {
+                    _stateAddSubCategory.value = DataState(error = it.message.toString())
+                }
+                else -> {}
+            }
+        }.launchIn(viewModelScope)
+    }
 
 }

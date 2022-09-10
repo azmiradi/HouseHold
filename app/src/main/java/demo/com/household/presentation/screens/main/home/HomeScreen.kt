@@ -1,4 +1,4 @@
-package demo.com.household.presentation.screens.main.user.home
+package demo.com.household.presentation.screens.main.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,13 +19,14 @@ import demo.com.household.data.Constants
 import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.main.admin.main.MainAdminScreen
 import demo.com.household.presentation.screens.main.admin.add_product.AddProduct
+import demo.com.household.presentation.screens.main.user.MainUserScreen
 import demo.com.household.ui.theme.BrinkPink
 import demo.com.household.ui.theme.CharlestonGreen
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
-    onNavigate: (NavigationDestination) -> Unit,
+    onNavigate: (NavigationDestination, data: String) -> Unit,
     onBack: () -> Unit,
 ) {
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
@@ -44,7 +45,8 @@ fun HomeScreen(
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             if (Constants.accountType == AccountType.Admin) {
-                MainAdminScreen(onNavigate = onNavigate, onBack = onBack)
+                //MainAdminScreen(onNavigate = onNavigate, onBack = onBack)
+                MainUserScreen(onBack = onBack, onNavigate =onNavigate)
             }
 
         }
@@ -52,7 +54,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun TopBar(scaffoldState: ScaffoldState, onNavigate: (NavigationDestination) -> Unit) {
+fun TopBar(scaffoldState: ScaffoldState, onNavigate: (NavigationDestination,String) -> Unit) {
     val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier
@@ -80,7 +82,7 @@ fun TopBar(scaffoldState: ScaffoldState, onNavigate: (NavigationDestination) -> 
 
         IconButton(onClick = {
             if (Constants.accountType == AccountType.Admin)
-                onNavigate(NavigationDestination.AddProduct)
+                onNavigate(NavigationDestination.AddProduct,"")
         }) {
             Icon(
                 painter = if (Constants.accountType == AccountType.Admin)

@@ -1,4 +1,4 @@
-package demo.com.household.presentation.screens.main.user.home
+package demo.com.household.presentation.screens.main.home
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun Drawer(
     scaffoldState: ScaffoldState,
-    onNavigate: (NavigationDestination) -> Unit,
+    onNavigate: (NavigationDestination,data:String) -> Unit,
     onBack: () -> Unit, ) {
     val scope = rememberCoroutineScope()
 

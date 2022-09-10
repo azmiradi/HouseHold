@@ -2,6 +2,7 @@ package demo.com.household.presentation.screens.main.admin.add_product
 
 import android.Manifest
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,6 +20,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -32,10 +34,8 @@ import demo.com.household.data.Category
 import demo.com.household.data.SubCategory
 import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.TopBarWithBack
-import demo.com.household.presentation.share_componennt.CustomTextInput
-import demo.com.household.presentation.share_componennt.ImageItems
-import demo.com.household.presentation.share_componennt.SampleSpinner
-import demo.com.household.presentation.share_componennt.UIRequirePermissions
+import demo.com.household.presentation.screens.main.admin.main.MainAdminViewModel
+import demo.com.household.presentation.share_componennt.*
 import demo.com.household.ui.theme.BrinkPink
 
 @Composable
@@ -165,8 +165,8 @@ fun AddProduct(
                     productName = productName.value,
                     productDescription = productDescription.value,
                     categoryID = categoryID.value,
-                    subCategoryID =subCategory.value,
-                    images =selectedImages,
+                    subCategoryID = subCategory.value,
+                    images = selectedImages,
                     productPrice = price.value,
                 )
             },
@@ -209,8 +209,56 @@ fun AddProduct(
     if (pickImage) {
         galleryLauncher.launch("image/*")
     }
+    HandelResonances()
+    val context = LocalContext.current
+
+    viewModel.stateAddProduct.value.data?.let {
+        LaunchedEffect(Unit) {
+            Toast.makeText(context, "Product Added", Toast.LENGTH_SHORT)
+                .show()
+            viewModel.resetState()
+            onBack()
+        }
+    }
+}
 
 
+@Composable
+fun HandelResonances(viewModel: AddProductViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+    if (viewModel.stateCategories.value.error.isNotEmpty()) {
+        LaunchedEffect(Unit) {
+            Toast.makeText(context, viewModel.stateCategories.value.error, Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+    if (viewModel.stateAddProduct.value.error.isNotEmpty()) {
+        LaunchedEffect(Unit) {
+            Toast.makeText(context, viewModel.stateAddProduct.value.error, Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+    if (viewModel.stateSubCategories.value.error.isNotEmpty()) {
+        LaunchedEffect(Unit) {
+            Toast.makeText(context, viewModel.stateSubCategories.value.error, Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    if (viewModel.subCategoryID.value) {
+        LaunchedEffect(Unit) {
+            Toast.makeText(context, "Select  Category and Sub Category First ", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    ProgressBar(
+        isShow = viewModel.stateCategories.value.isLoading
+                || viewModel.stateSubCategories.value.isLoading
+                || viewModel.stateAddProduct.value.isLoading,
+        message = stringResource(id = R.string.loading),
+        color = BrinkPink,
+    )
 }
 
 

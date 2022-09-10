@@ -12,3 +12,5 @@ val CharlestonGreen = Color(0xff2A2A2A)
 val ChineseSliver = Color(0xffC7C7C7)
 val Malachite = Color(0xff1ED543)
 val ChineseSliver2 = Color(0xFFDBDBDB)
+
+val TapsColor= Color(0xffD9D9D9)

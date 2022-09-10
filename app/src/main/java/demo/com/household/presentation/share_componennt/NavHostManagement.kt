@@ -9,7 +9,8 @@ import demo.com.household.presentation.screens.auth.login.LoginScreen
 import demo.com.household.presentation.screens.auth.signup.SignupScreen
 import demo.com.household.presentation.screens.auth.splash.SplashScreen
 import demo.com.household.presentation.screens.main.admin.add_product.AddProduct
-import demo.com.household.presentation.screens.main.user.home.HomeScreen
+import demo.com.household.presentation.screens.main.home.HomeScreen
+import demo.com.household.presentation.screens.main.user.products.ProductsScreen
 
 @Composable
 fun NavHostManagement() {
@@ -28,7 +29,7 @@ fun NavHostManagement() {
                 }
             })
         }
-        composable(NavigationDestination.Login.destination  ) {
+        composable(NavigationDestination.Login.destination) {
             //val accountType = it.arguments?.getString("accountType")
             LoginScreen(onNavigate = {
 
@@ -45,15 +46,21 @@ fun NavHostManagement() {
             })
         }
         composable(NavigationDestination.Home.destination) {
-            HomeScreen(onNavigate = {
-                if (it == NavigationDestination.Login)
-                    navController.navigate(it.destination) {
+            HomeScreen(onNavigate = { destination, data ->
+                if (destination == NavigationDestination.Login)
+                    navController.navigate(destination.destination) {
                         popUpTo(NavigationDestination.Home.destination) {
                             inclusive = true
                         }
                     }
-                else
-                    navController.navigate(it.destination)
+                else {
+                    if (data.isEmpty()) {
+                        navController.navigate(destination.destination)
+                    } else {
+                        navController.navigate(destination.destination.replace("{subCategory}",data))
+                    }
+                }
+
             }, onBack = {
                 navController.popBackStack()
             })
@@ -64,6 +71,16 @@ fun NavHostManagement() {
             }, onBack = {
                 navController.popBackStack()
             })
+        }
+
+        composable(NavigationDestination.Products.destination) {
+            val data = it.arguments?.getString("subCategory")
+
+            ProductsScreen(onNavigate = {
+                navController.navigate(it.destination)
+            }, onBack = {
+                navController.popBackStack()
+            }, categoryOb =data.toString() )
         }
 //        composable(NavigationDestination.AddSpend.destination) {
 //            AddSpendScreen(onNavigate = {

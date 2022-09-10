@@ -6,9 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import demo.com.household.presentation.DataState
 import com.demo.preferences.general.GeneralGeneralPrefsStoreImpl
 import com.google.firebase.database.*
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import demo.com.household.Resource
 import demo.com.household.data.*
@@ -16,9 +16,12 @@ import demo.com.household.data.Constants.CategoriesChild
 import demo.com.household.data.Constants.ProductsChild
 import demo.com.household.data.Constants.SubCategoriesChild
 import demo.com.household.domain.use_cases.UploadFirebaseImageUseCase
-import kotlinx.coroutines.Job
+import demo.com.household.presentation.DataState
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.tasks.await
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -109,8 +112,9 @@ class AddProductViewModel @Inject constructor(
         productPrice: String,
         categoryID: String,
         subCategoryID: String,
-        images: List<Uri>
+        images: MutableList<Uri>
     ) {
+        images.removeAt(0)
         validationInputs(
             productName,
             productDescription,
@@ -118,27 +122,21 @@ class AddProductViewModel @Inject constructor(
             categoryID,
             images,
             subCategoryID
-        )?.let {
+        )?.let { product ->
             _stateAddProduct.value = DataState(isLoading = true)
             val productID = databaseReference.child(CategoriesChild).push().key
-            val product = it
+
             product.productID = productID
-            val imagesMutable: MutableList<Uri> = ArrayList()
 
-            images.forEachIndexed { index, image ->
-                uploadImage(image) {
-                    imagesMutable.add(it.toUri())
-                    if (index == images.size - 1) {
-                        addProductData(product,imagesMutable)
-                    }
-                }
+            uploadImage(images) {
+                product.images = it
+                addProductData(product)
+                jobUpload?.cancel()
             }
-
         }
     }
 
-    private fun addProductData(product: Product, imagesMutable: MutableList<Uri>,) {
-        product.images = imagesMutable.map { it.toString() }
+    private fun addProductData(product: Product) {
 
         databaseReference.child(ProductsChild).child(product.productID.toString())
             .setValue(product)
@@ -195,21 +193,32 @@ class AddProductViewModel @Inject constructor(
 
 
     private fun uploadImage(
-        image: Uri,
-        imageUploaded: (String) -> Unit
+        imagesUri: List<Uri>,
+        imagesUploaded: (List<String>) -> Unit
     ) {
-        jobUpload?.cancel()
-        jobUpload = uploadFirebaseImageUseCase(image).onEach {
-            when (it) {
-                is Resource.Success -> {
-                    imageUploaded(it.data.toString())
-                }
-                is Resource.Error -> {
-                    _stateAddProduct.value = DataState(error = it.message.toString())
-                }
-                else -> {}
+        try {
+            viewModelScope.launch {
+                val uris: List<String> =
+                    withContext(Dispatchers.IO) {
+                        imagesUri.map { uri ->
+                            async {
+                                FirebaseStorage.getInstance().reference
+                                    .child(Calendar.getInstance().timeInMillis.toString())
+                                    .putFile(uri)
+                                    .await()
+                                    .storage
+                                    .downloadUrl
+                                    .await().toString()
+                            }
+                        }.awaitAll()
+                    }
+                imagesUploaded.invoke(uris)
             }
-        }.launchIn(viewModelScope)
+        } catch (e: Exception) {
+            _stateAddProduct.value = DataState(error = e.message.toString())
+
+        }
+
     }
 
 }

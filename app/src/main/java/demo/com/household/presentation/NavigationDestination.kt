@@ -7,6 +7,7 @@ enum class NavigationDestination(val destination: String) {
     Home("home"),
     AddProduct("add_product"),
     Products("products/subCategory={subCategory}"),
+    Product("product/product={product}"),
 
     Cart("cart"),
     MyOrders("myOrders"),

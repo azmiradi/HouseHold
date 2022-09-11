@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainUserScreen(
     viewModel: MainUserViewModel = hiltViewModel(),
-    onNavigate: (NavigationDestination,subCategory:String) -> Unit,
+    onNavigate: (NavigationDestination, subCategory: String) -> Unit,
     onBack: () -> Unit,
 ) {
     val categories = remember {
@@ -118,7 +118,8 @@ fun MainUserScreen(
             ) {
                 items(subCategories.value) { item ->
                     SubCategoryItem(subCategory = item) {
-                        onNavigate(NavigationDestination.Products,Gson().toJson(item))
+                        item.image = null
+                        onNavigate(NavigationDestination.Products, Gson().toJson(item))
                     }
                 }
             }

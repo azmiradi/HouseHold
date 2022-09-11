@@ -14,3 +14,4 @@ val Malachite = Color(0xff1ED543)
 val ChineseSliver2 = Color(0xFFDBDBDB)
 
 val TapsColor= Color(0xffD9D9D9)
+val TextColor= Color(0xffF2F2F2)

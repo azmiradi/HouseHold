@@ -35,7 +35,6 @@ import demo.com.household.data.Product
 import demo.com.household.data.SubCategory
 import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.TopBarWithBack
-import demo.com.household.presentation.screens.main.admin.main.MainAdminViewModel
 import demo.com.household.presentation.share_componennt.ProgressBar
 import demo.com.household.ui.theme.BrinkPink
 import demo.com.household.ui.theme.TapsColor
@@ -44,7 +43,7 @@ import demo.com.household.ui.theme.TapsColor
 fun ProductsScreen(
     categoryOb: String,
     viewModel: ProductsViewModel = hiltViewModel(),
-    onNavigate: (NavigationDestination) -> Unit,
+    onNavigate: (NavigationDestination, String) -> Unit,
     onBack: () -> Unit,
 ) {
     BackHandler {
@@ -61,6 +60,10 @@ fun ProductsScreen(
             products.value = it
         }
     }
+
+    LaunchedEffect(Unit) {
+        viewModel.getProducts(subCategory.id.toString())
+    }
     Column {
         TopBarWithBack(title = subCategory.name.toString(), onBack = onBack)
         Spacer(modifier = Modifier.height(20.dp))
@@ -75,11 +78,12 @@ fun ProductsScreen(
         ) {
             items(products.value) { item ->
                 ProductItem(productItem = item) {
-
+                    onNavigate(NavigationDestination.Product, item.productID.toString())
                 }
             }
         }
     }
+    HandelResonances()
 
 }
 
@@ -88,7 +92,8 @@ fun ProductsScreen(
 fun ProductItem(productItem: Product, onClick: () -> Unit) {
     Column(
         Modifier
-            .size(120.dp)
+            .width(176.dp)
+            .height(198.dp)
             .clickable {
                 onClick()
             }
@@ -140,45 +145,22 @@ fun ProductItem(productItem: Product, onClick: () -> Unit) {
                 .padding(5.dp),
             textAlign = TextAlign.Start
         )
-
-
     }
 }
 
 
 @Composable
-fun HandelResonances(viewModel: MainAdminViewModel = hiltViewModel()) {
+fun HandelResonances(viewModel: ProductsViewModel = hiltViewModel()) {
     val context = LocalContext.current
-    if (viewModel.stateCategories.value.error.isNotEmpty()) {
-        LaunchedEffect(Unit) {
-            Toast.makeText(context, viewModel.stateCategories.value.error, Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
-    if (viewModel.stateAddCategory.value.error.isNotEmpty()) {
-        LaunchedEffect(Unit) {
-            Toast.makeText(context, viewModel.stateAddCategory.value.error, Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
-    if (viewModel.stateAddSubCategory.value.error.isNotEmpty()) {
-        LaunchedEffect(Unit) {
-            Toast.makeText(context, viewModel.stateAddSubCategory.value.error, Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
 
-    if (viewModel.categorySelected.value) {
+    if (viewModel.stateProducts.value.error.isNotEmpty()) {
         LaunchedEffect(Unit) {
-            Toast.makeText(context, "Select Category First ", Toast.LENGTH_SHORT)
+            Toast.makeText(context, viewModel.stateProducts.value.error, Toast.LENGTH_SHORT)
                 .show()
         }
     }
-
     ProgressBar(
-        isShow = viewModel.stateCategories.value.isLoading
-                || viewModel.stateAddCategory.value.isLoading
-                || viewModel.stateAddSubCategory.value.isLoading,
+        isShow = viewModel.stateProducts.value.isLoading,
         message = stringResource(id = R.string.loading),
         color = BrinkPink,
     )

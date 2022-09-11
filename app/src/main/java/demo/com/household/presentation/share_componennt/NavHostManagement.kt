@@ -10,6 +10,8 @@ import demo.com.household.presentation.screens.auth.signup.SignupScreen
 import demo.com.household.presentation.screens.auth.splash.SplashScreen
 import demo.com.household.presentation.screens.main.admin.add_product.AddProduct
 import demo.com.household.presentation.screens.main.home.HomeScreen
+import demo.com.household.presentation.screens.main.user.cart.CartScreenScreen
+import demo.com.household.presentation.screens.main.user.product.ProductScreen
 import demo.com.household.presentation.screens.main.user.products.ProductsScreen
 
 @Composable
@@ -57,7 +59,12 @@ fun NavHostManagement() {
                     if (data.isEmpty()) {
                         navController.navigate(destination.destination)
                     } else {
-                        navController.navigate(destination.destination.replace("{subCategory}",data))
+                        navController.navigate(
+                            destination.destination.replace(
+                                "{subCategory}",
+                                data
+                            )
+                        )
                     }
                 }
 
@@ -76,12 +83,36 @@ fun NavHostManagement() {
         composable(NavigationDestination.Products.destination) {
             val data = it.arguments?.getString("subCategory")
 
-            ProductsScreen(onNavigate = {
+            ProductsScreen(onNavigate = { destination, productID ->
+                navController.navigate(
+                    destination.destination.replace(
+                        "{product}",
+                        productID
+                    )
+                )
+            }, onBack = {
+                navController.popBackStack()
+            }, categoryOb = data.toString())
+        }
+
+        composable(NavigationDestination.Product.destination) {
+            val data = it.arguments?.getString("product")
+
+            ProductScreen(onNavigate = {
                 navController.navigate(it.destination)
             }, onBack = {
                 navController.popBackStack()
-            }, categoryOb =data.toString() )
+            }, productID = data.toString())
         }
+
+        composable(NavigationDestination.Cart.destination) {
+            CartScreenScreen(onNavigate = {
+                navController.navigate(it.destination)
+            }, onBack = {
+                navController.popBackStack()
+            })
+        }
+
 //        composable(NavigationDestination.AddSpend.destination) {
 //            AddSpendScreen(onNavigate = {
 //                navController.navigate(it.destination)

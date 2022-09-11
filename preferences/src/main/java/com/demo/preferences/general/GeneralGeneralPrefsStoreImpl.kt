@@ -17,6 +17,8 @@ class GeneralGeneralPrefsStoreImpl @Inject constructor(
     }
 
     override fun getID(): Flow<String> = datastore.data.catch { exception ->
+        println("Data ERror : "+exception.message)
+
         if (exception is IOException) {
             emit(emptyPreferences())
         } else {

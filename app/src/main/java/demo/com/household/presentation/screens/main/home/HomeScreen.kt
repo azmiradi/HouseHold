@@ -81,12 +81,14 @@ fun TopBar(scaffoldState: ScaffoldState, onNavigate: (NavigationDestination,Stri
         )
 
         IconButton(onClick = {
-            if (Constants.accountType == AccountType.Admin)
-                onNavigate(NavigationDestination.AddProduct,"")
+//            if (Constants.accountType == AccountType.Admin)
+//                onNavigate(NavigationDestination.AddProduct,"")
+//            else
+                onNavigate(NavigationDestination.Cart,"")
         }) {
             Icon(
                 painter = if (Constants.accountType == AccountType.Admin)
-                    painterResource(id = R.drawable.add)
+                    painterResource(id = R.drawable.add_product)
                 else
                     painterResource(id = R.drawable.cart), "",
                 tint = Color.White

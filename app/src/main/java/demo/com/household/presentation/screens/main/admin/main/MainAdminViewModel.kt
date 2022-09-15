@@ -51,11 +51,8 @@ class MainAdminViewModel @Inject constructor(
     private val _subCategoryImage = mutableStateOf(false)
     val subCategoryImage: State<Boolean> = _subCategoryImage
 
-    init {
-        getCategories()
-    }
 
-    private fun getCategories() {
+    fun getCategories() {
         _stateCategories.value = DataState(isLoading = true)
         databaseReference.child(CategoriesChild)
             .addListenerForSingleValueEvent(object : ValueEventListener {

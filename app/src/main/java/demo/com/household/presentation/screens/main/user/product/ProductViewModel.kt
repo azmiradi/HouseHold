@@ -10,9 +10,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import demo.com.household.data.Cart
 import demo.com.household.data.Constants.ProductsChild
 import demo.com.household.data.Product
+import demo.com.household.data.RequestStatus
 import demo.com.household.presentation.DataState
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -49,23 +49,62 @@ class ProductViewModel @Inject constructor(
             })
     }
 
-    fun addProductToCart(product: Product?, count: String) {
-        val cart =Cart(product, count)
-         generalGeneralPrefsStoreImpl.getID().onEach {
+    fun addProductToCart(product: Product, count: String) {
+        product.count = count
+        generalGeneralPrefsStoreImpl.getID().onEach {
             _stateAddCart.value = DataState(isLoading = true)
             databaseReference =
                 FirebaseDatabase.getInstance().getReference("users")
-            databaseReference.child(it)
-                .child("Cart")
-                .child(product?.productID.toString())
-                .setValue(cart)
-                .addOnSuccessListener {
-                    _stateAddCart.value = DataState(data = "Product Added")
-                }
-                .addOnFailureListener {
-                    _stateAddCart.value = DataState(error = it.message.toString())
-                }
+                    .child(it).child("Cart")
+            getCartID { cartID, products ->
+
+                val mutableList: MutableList<Product> = ArrayList()
+                mutableList.addAll(products)
+                mutableList.add(product)
+                databaseReference.child(cartID)
+                    .child("_status")
+                    .setValue(RequestStatus.Cart.status)
+                    .addOnSuccessListener {
+                        databaseReference
+                            .child(cartID)
+                            .child("products")
+                            .setValue(mutableList)
+                            .addOnSuccessListener {
+                                _stateAddCart.value = DataState(data = "Product Added")
+                            }
+                            .addOnFailureListener {
+                                _stateAddCart.value = DataState(error = it.message.toString())
+                            }
+                    }.addOnFailureListener {
+                        _stateAddCart.value = DataState(error = it.message.toString())
+                    }
+
+            }
+
+
         }.launchIn(viewModelScope)
+    }
+
+    private fun getCartID(onGetID: (String, List<Product>) -> Unit) {
+        databaseReference.addListenerForSingleValueEvent(
+            object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (data: DataSnapshot in snapshot.children) {
+                        val cart = data.getValue(Cart::class.java)
+                        if (cart?.status() == RequestStatus.Cart) {
+                            onGetID(data.key.toString(), cart.products ?: ArrayList())
+                            return
+                        }
+                    }
+                    onGetID(databaseReference.push().key.toString(), ArrayList())
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+
+                }
+
+            })
+
     }
 
     fun resetState() {

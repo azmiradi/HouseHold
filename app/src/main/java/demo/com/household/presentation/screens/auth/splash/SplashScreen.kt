@@ -32,24 +32,21 @@ fun SplashScreen(
     onNavigate: (NavigationDestination) -> Unit,
     viewModel: SplashViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state.value
-    if (state.notLogin) {
-        LaunchedEffect(Unit) {
-            onNavigate(NavigationDestination.Login)
-        }
-    }
-
     val showButtons = remember {
         mutableStateOf(false)
     }
+    val state = viewModel.state.value
+    if (state.notLogin) {
+        LaunchedEffect(Unit) {
+            showButtons.value = true
+
+        }
+    }
+
+
     state.login?.let {
         LaunchedEffect(Unit) {
-            if (it.isNotEmpty()) {
-                showButtons.value = false
-                Constants.UserID = it
-                onNavigate(NavigationDestination.Home)
-            } else
-                showButtons.value = true
+            onNavigate(NavigationDestination.Home)
         }
     }
     Column(

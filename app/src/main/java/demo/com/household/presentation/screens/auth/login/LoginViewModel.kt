@@ -93,8 +93,7 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun saveData(id: String) {
-        Constants.UserID = id
-        viewModelScope.launch {
+         viewModelScope.launch {
             generalGeneralPrefsStoreImpl.saveID(id)
         }
     }

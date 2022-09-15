@@ -8,10 +8,10 @@ enum class NavigationDestination(val destination: String) {
     AddProduct("add_product"),
     Products("products/subCategory={subCategory}"),
     Product("product/product={product}"),
-
-    Cart("cart"),
+    Cart("cart/cart={cartID}"),
     MyOrders("myOrders"),
-    Purchase("purchase"),
-    SubCategory("sub_category"),
+    Orders("orders"),
 
+    Purchase("purchase"),
+    SubCategory("sub_category/categoryID={categoryID}")
 }

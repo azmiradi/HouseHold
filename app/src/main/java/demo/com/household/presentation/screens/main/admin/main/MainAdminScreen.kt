@@ -40,12 +40,15 @@ import demo.com.household.ui.theme.ChineseSliver2
 
 @Composable
 fun MainAdminScreen(
-    onNavigate: (NavigationDestination) -> Unit,
+    onNavigate: (NavigationDestination, String) -> Unit,
     viewModel: MainAdminViewModel = hiltViewModel(),
     onBack: () -> Unit,
 ) {
     val imageUri = "android.resource://demo.com.household/drawable/add_image"
 
+    LaunchedEffect(Unit) {
+        viewModel.getCategories()
+    }
     val selectedImage =
         remember {
             mutableStateOf(imageUri.toUri())
@@ -97,101 +100,104 @@ fun MainAdminScreen(
         ) {
             items(categories.value) { item ->
                 ItemCategory(categoryName = item.name.toString()) {
-
+                    onNavigate(NavigationDestination.SubCategory, item.id.toString())
                 }
             }
         }
-        Spacer(modifier = Modifier.height(10.dp))
-        Divider(color = ChineseSliver, thickness = 3.dp)
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(
-            text = stringResource(id = R.string.add_new_category),
-            color = CharlestonGreen,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        CustomTextInput(
-            hint = stringResource(id = R.string.category_name),
-            mutableState = categoryName, modifier = Modifier
-                .fillMaxWidth(),
-            isError = viewModel.categoryName.value
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Button(
-            onClick = {
-                viewModel.addCategory(
-                    Category(
-                        name = categoryName.value
-                    )
-                )
-            },
-            colors = ButtonDefaults.buttonColors(BrinkPink),
-        ) {
+        Column(Modifier.verticalScroll(rememberScrollState())) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Divider(color = ChineseSliver, thickness = 3.dp)
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
-                text = stringResource(id = R.string.confirm),
-                fontWeight = FontWeight.Bold,
+                text = stringResource(id = R.string.add_new_category),
+                color = CharlestonGreen,
                 fontSize = 18.sp,
-                color = Color.White
+                fontWeight = FontWeight.Bold
             )
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        Divider(color = ChineseSliver, thickness = 3.dp)
-        Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-        Text(
-            text = stringResource(id = R.string.add_sub_category),
-            color = CharlestonGreen,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(10.dp))
+            CustomTextInput(
+                hint = stringResource(id = R.string.category_name),
+                mutableState = categoryName, modifier = Modifier
+                    .fillMaxWidth(),
+                isError = viewModel.categoryName.value
+            )
+            Spacer(modifier = Modifier.height(10.dp))
 
-        SampleSpinner(
-            hint = stringResource(id = R.string.select_category),
-            list = categories.value.map {
-                Pair(it.name.toString(), it.id.toString())
-            }, onSelectionChanged = {
-                selectedCategory.value = it
+            Button(
+                onClick = {
+                    viewModel.addCategory(
+                        Category(
+                            name = categoryName.value
+                        )
+                    )
+                },
+                colors = ButtonDefaults.buttonColors(BrinkPink),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.confirm),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
             }
-        )
+            Spacer(modifier = Modifier.height(20.dp))
+            Divider(color = ChineseSliver, thickness = 3.dp)
+            Spacer(modifier = Modifier.height(10.dp))
 
-        Spacer(modifier = Modifier.height(10.dp))
-        CustomTextInput(
-            hint = stringResource(id = R.string.add_sub_category),
-            mutableState = subCategoryName, modifier = Modifier
-                .fillMaxWidth(),
-            isError = viewModel.subCategoryName.value
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-
-        ImageItems(selectedImage.value) {
-            pickImage = true
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Button(
-            onClick = {
-                viewModel.addSubCategory(
-                    SubCategory(
-                        name = subCategoryName.value,
-                        categoryID = selectedCategory.value,
-                        image = selectedImage.value.toString()
-                    )
-                )
-            },
-            colors = ButtonDefaults.buttonColors(BrinkPink),
-        ) {
             Text(
-                text = stringResource(id = R.string.confirm),
-                fontWeight = FontWeight.Bold,
+                text = stringResource(id = R.string.add_sub_category),
+                color = CharlestonGreen,
                 fontSize = 18.sp,
-                color = Color.White
+                fontWeight = FontWeight.Bold
             )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            SampleSpinner(
+                hint = stringResource(id = R.string.select_category),
+                list = categories.value.map {
+                    Pair(it.name.toString(), it.id.toString())
+                }, onSelectionChanged = {
+                    selectedCategory.value = it
+                }
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+            CustomTextInput(
+                hint = stringResource(id = R.string.add_sub_category),
+                mutableState = subCategoryName, modifier = Modifier
+                    .fillMaxWidth(),
+                isError = viewModel.subCategoryName.value
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+
+            ImageItems(selectedImage.value) {
+                pickImage = true
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Button(
+                onClick = {
+                    viewModel.addSubCategory(
+                        SubCategory(
+                            name = subCategoryName.value,
+                            categoryID = selectedCategory.value,
+                            image = selectedImage.value.toString()
+                        )
+                    )
+                },
+                colors = ButtonDefaults.buttonColors(BrinkPink),
+            ) {
+                Text(
+                    text = stringResource(id = R.string.confirm),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.White
+                )
+            }
         }
+
     }
     val context = LocalContext.current
 

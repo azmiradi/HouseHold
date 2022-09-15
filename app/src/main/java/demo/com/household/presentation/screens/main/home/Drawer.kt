@@ -31,17 +31,19 @@ import kotlinx.coroutines.launch
 @Composable
 fun Drawer(
     scaffoldState: ScaffoldState,
-    onNavigate: (NavigationDestination,data:String) -> Unit,
-    onBack: () -> Unit, ) {
+    onNavigate: (NavigationDestination, data: String) -> Unit,
+    onBack: () -> Unit,
+    onLogout: () -> Unit,
+) {
     val scope = rememberCoroutineScope()
 
     BackHandler {
-       if (scaffoldState.drawerState.isOpen)
-           scope.launch {
-               scaffoldState.drawerState.close()
-           }
+        if (scaffoldState.drawerState.isOpen)
+            scope.launch {
+                scaffoldState.drawerState.close()
+            }
         else
-           onBack()
+            onBack()
     }
     Column {
         // Header
@@ -69,10 +71,18 @@ fun Drawer(
                 .padding(10.dp)
                 .fillMaxWidth()
                 .clickable {
+                    if (accountType?.equals(
+                            AccountType
+                                .User
+                        ) == true
+                    )
+                        onNavigate(NavigationDestination.MyOrders, "")
+                    else
+                        onNavigate(NavigationDestination.Orders, "")
                     scope.launch {
                         scaffoldState.drawerState.close()
                     }
-                 },
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -104,6 +114,7 @@ fun Drawer(
                 .padding(10.dp)
                 .fillMaxWidth()
                 .clickable {
+                    onLogout()
                     scope.launch {
                         scaffoldState.drawerState.close()
                     }

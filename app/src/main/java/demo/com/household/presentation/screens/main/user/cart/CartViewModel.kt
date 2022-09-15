@@ -8,6 +8,8 @@ import com.demo.preferences.general.GeneralGeneralPrefsStoreImpl
 import com.google.firebase.database.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import demo.com.household.data.Cart
+import demo.com.household.data.Product
+import demo.com.household.data.RequestStatus
 import demo.com.household.presentation.DataState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -23,11 +25,14 @@ class CartViewModel @Inject constructor(
 
     private var job: Job? = null
 
-    private val _stateCart = mutableStateOf(DataState<List<Cart>>())
-    val stateCart: State<DataState<List<Cart>>> = _stateCart
+    private val _stateCart = mutableStateOf(DataState<Pair<List<Product>,String>>())
+    val stateCart: State<DataState<Pair<List<Product>,String>>> = _stateCart
 
     private val _stateDeleteCart = mutableStateOf(DataState<String>())
     val stateDeleteCart: State<DataState<String>> = _stateDeleteCart
+
+    private val _stateRequestData = mutableStateOf(DataState<String>())
+    val stateRequestData: State<DataState<String>> = _stateRequestData
 
     fun getCarts() {
         generalGeneralPrefsStoreImpl.getID().onEach {
@@ -36,15 +41,17 @@ class CartViewModel @Inject constructor(
                 .child("Cart")
                 .addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val cartList: MutableList<Cart> = ArrayList()
+                        val cartList: MutableList<Product> = ArrayList()
+
                         for (data: DataSnapshot in snapshot.children) {
                             val cart = data.getValue(Cart::class.java)
-                            if (cart != null) {
-                                cartList.add(cart)
+                            if (cart?.status() == RequestStatus.Cart) {
+                                cart.products?.let { it1 -> cartList.addAll(it1) }
+                                _stateCart.value = DataState(data = Pair(cartList,data.key.toString()))
+                                return
                             }
                         }
-                        _stateCart.value = DataState(data = cartList)
-
+                        _stateCart.value = DataState(data = Pair(cartList,""))
 
                     }
 
@@ -62,11 +69,13 @@ class CartViewModel @Inject constructor(
         job?.cancel()
     }
 
-    fun deleteCart(productID: String?) {
+    fun deleteCart(productID: String?,cartID:String) {
         generalGeneralPrefsStoreImpl.getID().onEach {
             _stateDeleteCart.value = DataState(isLoading = true)
             databaseReference.child(it)
                 .child("Cart")
+                .child(cartID)
+                .child("products")
                 .child(productID.toString())
                 .removeValue()
                 .addOnSuccessListener {
@@ -77,5 +86,9 @@ class CartViewModel @Inject constructor(
 
                 }
         }.launchIn(viewModelScope)
+    }
+
+    fun setRequest() {
+
     }
 }

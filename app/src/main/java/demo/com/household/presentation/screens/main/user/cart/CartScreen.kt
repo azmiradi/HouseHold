@@ -6,11 +6,9 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Error
@@ -29,9 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
-import com.google.accompanist.pager.ExperimentalPagerApi
 import demo.com.household.R
 import demo.com.household.data.Cart
+import demo.com.household.data.Product
 import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.TopBarWithBack
 import demo.com.household.presentation.share_componennt.ProgressBar
@@ -41,21 +39,37 @@ import demo.com.household.ui.theme.TextColor
 @Composable
 fun CartScreenScreen(
     viewModel: CartViewModel = hiltViewModel(),
-    onNavigate: (NavigationDestination) -> Unit,
+    onNavigate: (NavigationDestination, String) -> Unit,
     onBack: () -> Unit,
 ) {
     BackHandler {
         viewModel.resetState()
         onBack()
     }
-    var carts by remember {
-        mutableStateOf<List<Cart>>(ArrayList())
+    val products = remember {
+        mutableStateListOf<Product>()
+    }
+
+    var totalAmount by remember {
+        mutableStateOf<String>("0")
+    }
+    var cartID by remember {
+        mutableStateOf<String>("0")
     }
     viewModel.stateCart.value.data?.let {
         LaunchedEffect(Unit) {
-            carts = it
+            cartID = it.second
+            products.clear()
+            products.addAll(it.first)
+            products.forEach {
+                totalAmount =
+                    (((it.price ?: 0) * (it.count ?: "0").toInt())
+                            + totalAmount.toInt())
+                        .toString()
+            }
         }
     }
+
 
     viewModel.stateDeleteCart.value.data?.let {
         LaunchedEffect(Unit) {
@@ -81,14 +95,73 @@ fun CartScreenScreen(
             Modifier
                 .fillMaxSize()
                 .padding(end = 16.dp, start = 16.dp)
-                .weight(1f)
+                .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(carts) {
-                CartItem(cart = it) {
-                    viewModel.deleteCart(it.product?.productID)
+            itemsIndexed(products) { index, product ->
+                CartItem(cart = product, onDelete = {
+                    viewModel.deleteCart(index.toString(), cartID = cartID)
+                }) {
+                    product.count = it
+                    totalAmount = "0"
+                    products.forEach {
+                        totalAmount =
+                            (((it.price ?: 0) * (it.count ?: "0").toInt()) +
+                                    totalAmount.toInt())
+                                .toString()
+                    }
                 }
             }
         }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp, start = 16.dp)
+                .border(BorderStroke(1.dp, Color.LightGray)),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Products Amounts",
+                color = Color.LightGray,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(15.dp)
+            )
+
+            Text(
+                text = totalAmount,
+                color = Color.Black,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(15.dp)
+
+            )
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp, start = 16.dp),
+            onClick = {
+                if (products.isNotEmpty())
+                    onNavigate(NavigationDestination.Purchase, cartID)
+            },
+            colors = ButtonDefaults.buttonColors(BrinkPink),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Text(
+                text = "CONFIRM PURCHASE",
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                color = Color.White
+            )
+        }
+        Spacer(modifier = Modifier.height(59.dp))
+
 
     }
     HandelResonances()
@@ -98,18 +171,21 @@ fun CartScreenScreen(
 
 
 @Composable
-fun CartItem(cart: Cart, onDelete: () -> Unit) {
-     Row(
+fun CartItem(
+    cart: Product, onDelete: () -> Unit,
+    onCountChange: (String) -> Unit
+) {
+    Row(
         Modifier
             .fillMaxWidth()
             .clickable {
 
             }
             .clip(RoundedCornerShape(3.dp))
-            .border(BorderStroke(1.dp, Color.Gray))
+            .border(BorderStroke(1.dp, Color.LightGray))
     ) {
         SubcomposeAsyncImage(
-            model = cart.product?.images?.get(0).toString(),
+            model = cart.images?.get(0).toString(),
             contentDescription = "",
             modifier = Modifier
                 .size(105.dp),
@@ -131,7 +207,7 @@ fun CartItem(cart: Cart, onDelete: () -> Unit) {
                 .weight(1f)
         ) {
             Text(
-                text = cart.product?.name.toString(),
+                text = cart.name.toString(),
                 fontWeight = FontWeight.Normal,
                 fontSize = 15.sp,
                 color = Color.Black,
@@ -143,7 +219,7 @@ fun CartItem(cart: Cart, onDelete: () -> Unit) {
 
 
             Text(
-                text = cart.product?.price.toString(),
+                text = cart.price.toString(),
                 fontWeight = FontWeight.Normal,
                 fontSize = 15.sp,
                 color = Color.Black,
@@ -154,12 +230,14 @@ fun CartItem(cart: Cart, onDelete: () -> Unit) {
             )
 
             Row(
-                verticalAlignment = Alignment.CenterVertically) {
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 var numQuantity by remember {
                     mutableStateOf(cart.count ?: "1")
                 }
                 IconButton(onClick = {
                     numQuantity = (numQuantity.toInt() + 1).toString()
+                    onCountChange(numQuantity)
                 }) {
                     Image(
                         painter = painterResource(id = R.drawable.add), contentDescription = ""
@@ -174,6 +252,8 @@ fun CartItem(cart: Cart, onDelete: () -> Unit) {
                 IconButton(onClick = {
                     if (numQuantity.toInt() > 1)
                         numQuantity = (numQuantity.toInt() - 1).toString()
+                    onCountChange(numQuantity)
+
                 }) {
                     Image(
                         painter = painterResource(id = R.drawable.menus), contentDescription = ""

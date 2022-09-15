@@ -3,25 +3,23 @@ package demo.com.household.presentation.screens.main.admin.add_product
 import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.demo.preferences.general.GeneralGeneralPrefsStoreImpl
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import demo.com.household.Resource
-import demo.com.household.data.*
+import demo.com.household.data.Category
 import demo.com.household.data.Constants.CategoriesChild
 import demo.com.household.data.Constants.ProductsChild
 import demo.com.household.data.Constants.SubCategoriesChild
+import demo.com.household.data.Product
+import demo.com.household.data.SubCategory
 import demo.com.household.domain.use_cases.UploadFirebaseImageUseCase
 import demo.com.household.presentation.DataState
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.tasks.await
-import java.util.Calendar
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel

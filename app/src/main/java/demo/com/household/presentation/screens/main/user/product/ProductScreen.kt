@@ -157,10 +157,12 @@ fun ProductScreen(
                 .fillMaxWidth()
                 .padding(end = 16.dp, start = 16.dp),
             onClick = {
-                viewModel.addProductToCart(
-                    product,
-                    numQuantity
-                )
+                product?.let {
+                    viewModel.addProductToCart(
+                        it,
+                        numQuantity
+                    )
+                }
             },
             colors = ButtonDefaults.buttonColors(BrinkPink),
             shape = RoundedCornerShape(8.dp)

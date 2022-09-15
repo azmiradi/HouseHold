@@ -63,7 +63,8 @@ fun CustomTextInput(
         singleLine = true,
         value = mutableState.value,
         leadingIcon = leadingIcon,
-        modifier = modifier.navigationBarsWithImePadding()
+        modifier = modifier
+            .navigationBarsWithImePadding()
             .clickable(role = Role.Tab) {
                 onClick?.let { it() }
             },
@@ -191,15 +192,16 @@ fun NormalTextFiled(
 
 @Composable
 fun SampleSpinner(
+    modifier: Modifier? = null,
     hint: String,
-    list: List<Pair<String,String>>,
-    onSelectionChanged: (id:String) -> Unit
+    list: List<Pair<String, String>>,
+    onSelectionChanged: (id: String) -> Unit
 ) {
 
     var selected by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) } // initial value
 
-    Box (Modifier.fillMaxWidth()){
+    Box(modifier ?: Modifier.fillMaxWidth()) {
         Column {
             OutlinedTextField(
                 value = (selected),
@@ -218,7 +220,8 @@ fun SampleSpinner(
                         fontWeight = FontWeight.Normal
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .navigationBarsWithImePadding(),
                 trailingIcon = { Icon(Icons.Outlined.ArrowDropDown, null) },
                 readOnly = true,
@@ -229,7 +232,8 @@ fun SampleSpinner(
                 )
             )
             DropdownMenu(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(end = 16.dp, start = 16.dp),
                 expanded = expanded,
                 onDismissRequest = { expanded = false },

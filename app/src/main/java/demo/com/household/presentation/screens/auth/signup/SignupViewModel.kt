@@ -142,13 +142,12 @@ class SignupViewModel @Inject constructor(private val generalGeneralPrefsStoreIm
                 mobile = mobile,
                 username = username,
                 email = email,
-                _accountType = 2,
+                _accountType = AccountType.User.accountType,
             )
         }
     }
 
     private fun saveData(id: String) {
-        Constants.UserID = id
         viewModelScope.launch {
             generalGeneralPrefsStoreImpl.saveID(id)
         }

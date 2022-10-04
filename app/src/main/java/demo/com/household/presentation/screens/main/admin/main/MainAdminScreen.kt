@@ -100,6 +100,7 @@ fun MainAdminScreen(
         ) {
             items(categories.value) { item ->
                 ItemCategory(categoryName = item.name.toString()) {
+                    viewModel.resetState()
                     onNavigate(NavigationDestination.SubCategory, item.id.toString())
                 }
             }
@@ -211,6 +212,7 @@ fun MainAdminScreen(
     viewModel.stateAddSubCategory.value.data?.let {
         LaunchedEffect(Unit) {
             subCategoryName.value = ""
+            selectedImage.value= imageUri.toUri()
             Toast.makeText(context, "Sub Category Added", Toast.LENGTH_SHORT).show()
         }
     }

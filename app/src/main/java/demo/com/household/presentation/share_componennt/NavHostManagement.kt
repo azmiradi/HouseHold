@@ -118,10 +118,10 @@ fun NavHostManagement() {
         }
 
         composable(NavigationDestination.Cart.destination) {
-            CartScreenScreen(onNavigate = { destination, cartID ->
+            CartScreenScreen(onNavigate = { destination, totalAmount ->
                 navController.navigate(
                     destination.destination
-                        .replace("{cartID}", cartID)
+                        .replace("{totalAmount}", totalAmount)
                 )
             }, onBack = {
                 navController.popBackStack()
@@ -129,11 +129,13 @@ fun NavHostManagement() {
         }
 
         composable(NavigationDestination.Purchase.destination) {
+            val totalAmount = it.arguments?.getString("totalAmount")
+
             PaymentScreen(onNavigate = {
                 navController.navigate(it.destination)
             }, onBack = {
                 navController.popBackStack()
-            }, cartID = "")
+            }, totalAmount = totalAmount.toString())
         }
 
         composable(NavigationDestination.MyOrders.destination) {

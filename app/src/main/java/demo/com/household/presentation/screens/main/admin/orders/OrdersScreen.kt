@@ -27,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import demo.com.household.R
 import demo.com.household.data.Cart
+import demo.com.household.data.Constants
 import demo.com.household.data.Product
 import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.TopBarWithBack
@@ -171,7 +172,7 @@ fun OrderItem(
                 )
 
                 Text(
-                    text = totalAmount,
+                    text = "$totalAmount ${Constants.CURRENCY}",
                     fontSize = 17.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(12.dp)
@@ -255,7 +256,7 @@ fun ProductItem(product: Product) {
         )
         Spacer(modifier = Modifier.width(10.dp))
         Text(
-            text = ((product.count ?: "0").toInt() * (product.price ?: 0)).toString(),
+            text = "${((product.count ?: "0").toInt() * (product.price ?: 0)).toString()} ${Constants.CURRENCY}",
             color = Color.Black,
             fontSize = 17.sp,
             textAlign = TextAlign.End,

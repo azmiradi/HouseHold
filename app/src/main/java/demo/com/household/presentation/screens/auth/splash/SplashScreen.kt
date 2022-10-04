@@ -32,14 +32,12 @@ fun SplashScreen(
     onNavigate: (NavigationDestination) -> Unit,
     viewModel: SplashViewModel = hiltViewModel()
 ) {
-    val showButtons = remember {
-        mutableStateOf(false)
-    }
+
     val state = viewModel.state.value
     if (state.notLogin) {
         LaunchedEffect(Unit) {
-            showButtons.value = true
-
+            onNavigate(NavigationDestination.Login)
+            viewModel.resetState()
         }
     }
 
@@ -59,50 +57,6 @@ fun SplashScreen(
         Image(painter = painterResource(id = R.drawable.logo_splash), contentDescription = "")
         Spacer(modifier = Modifier.height(18.dp))
 
-        AnimatedVisibility(visible = showButtons.value) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Spacer(modifier = Modifier.height(170.dp))
-                Button(
-                    modifier = Modifier.width(250.dp),
-                    onClick = {
-                        onNavigate(NavigationDestination.Login)
-                        viewModel.resetState()
-                    },
-                    colors = ButtonDefaults.buttonColors(CharlestonGreen),
-                    shape = RoundedCornerShape(25.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.login_as_a_user),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = Color.White
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(15.dp))
-
-                Button(
-                    modifier = Modifier.width(250.dp),
-                    onClick = {
-                        onNavigate(NavigationDestination.Login)
-                        viewModel.resetState()
-
-                    },
-                    colors = ButtonDefaults.buttonColors(Color.White),
-                    shape = RoundedCornerShape(25.dp)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.login_as_admin),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        color = BrinkPink
-                    )
-                }
-            }
-        }
 
     }
 }

@@ -1,6 +1,7 @@
 package demo.com.household.presentation.screens.main.user.payment
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -10,7 +11,10 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import demo.com.household.R
+import demo.com.household.data.Constants
 import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.TopBarWithBack
 import demo.com.household.presentation.share_componennt.CustomTextInput
@@ -34,8 +39,12 @@ fun PaymentScreen(
     onNavigate: (NavigationDestination) -> Unit,
     onBack: () -> Unit,
     viewModel: PaymentViewModel = hiltViewModel(),
-    cartID: String,
+    totalAmount: String,
 ) {
+    BackHandler() {
+        onBack()
+        viewModel.resetState()
+    }
     Column(
         Modifier.fillMaxSize(),
     ) {
@@ -46,9 +55,7 @@ fun PaymentScreen(
         val prefix = remember {
             mutableStateOf("")
         }
-        val totalAmount by remember {
-            mutableStateOf<String>("0")
-        }
+
         val month = remember {
             mutableStateOf("")
         }
@@ -57,7 +64,10 @@ fun PaymentScreen(
         }
         TopBarWithBack(
             title = stringResource(id = R.string.cart),
-            onBack = onBack
+            onBack = {
+                onBack()
+                viewModel.resetState()
+            }
         )
         Spacer(modifier = Modifier.height(20.dp))
         Column(
@@ -78,38 +88,28 @@ fun PaymentScreen(
 
             Spacer(modifier = Modifier.height(37.dp))
 
-            SampleSpinner(
-                hint = "Select your bank",
-                list = listOf(
-                    Pair("CIB", "CIB"),
-                    Pair("EgyBank", "EgyBank"),
-                    Pair("Al Ahly Bank", "Al Ahly Bank")
-                ), onSelectionChanged = {
+//            SampleSpinner(
+//                hint = "Select your bank",
+//                list = listOf(
+//                    Pair("CIB", "CIB"),
+//                    Pair("EgyBank", "EgyBank"),
+//                    Pair("Al Ahly Bank", "Al Ahly Bank")
+//                ), onSelectionChanged = {
+//
+//
+//                }
+//            )
+//            Spacer(modifier = Modifier.height(20.dp))
 
-
-                }
+            CustomTextInput(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                hint = "Card number", mutableState = cardNum
             )
+
             Spacer(modifier = Modifier.height(20.dp))
 
-            Row() {
-                CustomTextInput(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    hint = "Prefix", mutableState = prefix
-                )
-                Spacer(modifier = Modifier.width(9.dp))
-
-                CustomTextInput(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    hint = "Card number", mutableState = cardNum
-                )
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row() {
+            Row {
                 CustomTextInput(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -145,7 +145,7 @@ fun PaymentScreen(
                 )
 
                 Text(
-                    text = totalAmount,
+                    text = "$totalAmount ${Constants.CURRENCY}",
                     color = Color.Black,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -179,6 +179,7 @@ fun PaymentScreen(
         LaunchedEffect(Unit) {
             Toast.makeText(context, it, Toast.LENGTH_SHORT)
                 .show()
+            viewModel.resetState()
             onNavigate(NavigationDestination.Home)
         }
     }

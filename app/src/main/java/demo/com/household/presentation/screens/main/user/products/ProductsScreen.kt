@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import com.google.gson.Gson
 import demo.com.household.R
+import demo.com.household.data.Constants
 import demo.com.household.data.Product
 import demo.com.household.data.SubCategory
 import demo.com.household.presentation.NavigationDestination
@@ -136,7 +137,7 @@ fun ProductItem(productItem: Product, onClick: () -> Unit) {
             textAlign = TextAlign.Start
         )
         Text(
-            text = productItem.price.toString(),
+            text =" ${productItem.price.toString()} ${ Constants.CURRENCY}",
             fontWeight = FontWeight.Normal,
             fontSize = 15.sp,
             color = Color.Black,

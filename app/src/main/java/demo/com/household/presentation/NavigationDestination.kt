@@ -12,6 +12,6 @@ enum class NavigationDestination(val destination: String) {
     MyOrders("myOrders"),
     Orders("orders"),
 
-    Purchase("purchase"),
+    Purchase("purchase/totalAmount={totalAmount}"),
     SubCategory("sub_category/categoryID={categoryID}")
 }

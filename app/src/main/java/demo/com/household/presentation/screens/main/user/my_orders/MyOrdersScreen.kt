@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import demo.com.household.R
 import demo.com.household.data.Cart
+import demo.com.household.data.Constants
 import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.TopBarWithBack
 import demo.com.household.presentation.share_componennt.ProgressBar
@@ -128,7 +129,7 @@ fun MyOrderItem(
             ) {
                 Text(text = "Total price", color = Color.Gray)
                 Spacer(modifier = Modifier.width(10.dp))
-                Text(text = totalAmount, color = Color.Black)
+                Text(text ="$totalAmount ${Constants.CURRENCY}" , color = Color.Black)
             }
         }
         Spacer(modifier = Modifier.height(17.dp))

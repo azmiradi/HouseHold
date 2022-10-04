@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import demo.com.household.R
 import demo.com.household.data.Cart
+import demo.com.household.data.Constants
 import demo.com.household.data.Product
 import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.TopBarWithBack
@@ -73,6 +74,8 @@ fun CartScreenScreen(
 
     viewModel.stateDeleteCart.value.data?.let {
         LaunchedEffect(Unit) {
+            totalAmount= "0"
+            viewModel.resetState()
             viewModel.getCarts()
         }
     }
@@ -132,7 +135,7 @@ fun CartScreenScreen(
             )
 
             Text(
-                text = totalAmount,
+                text = "$totalAmount ${Constants.CURRENCY}",
                 color = Color.Black,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -148,7 +151,10 @@ fun CartScreenScreen(
                 .padding(end = 16.dp, start = 16.dp),
             onClick = {
                 if (products.isNotEmpty())
-                    onNavigate(NavigationDestination.Purchase, cartID)
+                {
+                    onNavigate(NavigationDestination.Purchase, totalAmount)
+                    viewModel.resetState()
+                }
             },
             colors = ButtonDefaults.buttonColors(BrinkPink),
             shape = RoundedCornerShape(8.dp)
@@ -165,6 +171,7 @@ fun CartScreenScreen(
 
     }
     HandelResonances()
+
 
 
 }
@@ -219,7 +226,7 @@ fun CartItem(
 
 
             Text(
-                text = cart.price.toString(),
+                text =" ${cart.price.toString()} ${ Constants.CURRENCY}",
                 fontWeight = FontWeight.Normal,
                 fontSize = 15.sp,
                 color = Color.Black,

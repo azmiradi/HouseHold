@@ -27,6 +27,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import demo.com.household.R
+import demo.com.household.data.Constants
 import demo.com.household.data.Product
 import demo.com.household.presentation.NavigationDestination
 import demo.com.household.presentation.screens.TopBarWithBack
@@ -85,7 +86,7 @@ fun ProductScreen(
             )
 
             Text(
-                text = product?.price.toString(),
+                text =" ${product?.price.toString()} ${ Constants.CURRENCY}",
                 fontSize = 25.sp,
                 fontWeight = FontWeight.Bold,
                 color = BrinkPink
@@ -252,7 +253,7 @@ fun HandelResonances(viewModel: ProductViewModel = hiltViewModel()) {
 
     ProgressBar(
         isShow = viewModel.stateProducts.value.isLoading||
-                viewModel.stateProducts.value.isLoading,
+                viewModel.stateAddCart.value.isLoading,
         message = stringResource(id = R.string.loading),
         color = BrinkPink,
     )

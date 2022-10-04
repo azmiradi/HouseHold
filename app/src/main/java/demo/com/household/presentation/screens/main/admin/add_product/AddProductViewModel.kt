@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.demo.preferences.general.GeneralGeneralPrefsStoreImpl
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
@@ -17,8 +16,7 @@ import demo.com.household.data.Product
 import demo.com.household.data.SubCategory
 import demo.com.household.domain.use_cases.UploadFirebaseImageUseCase
 import demo.com.household.presentation.DataState
-import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.Job
 import java.util.*
 import javax.inject.Inject
 
@@ -29,6 +27,7 @@ class AddProductViewModel @Inject constructor(
 ) : ViewModel() {
     private var databaseReference: DatabaseReference =
         FirebaseDatabase.getInstance().getReference("data")
+    private val imagesList: MutableList<String> = ArrayList()
 
     private var job: Job? = null
 
@@ -121,13 +120,15 @@ class AddProductViewModel @Inject constructor(
             images,
             subCategoryID
         )?.let { product ->
+            val allImages: MutableList<String> = ArrayList()
             _stateAddProduct.value = DataState(isLoading = true)
             val productID = databaseReference.child(CategoriesChild).push().key
 
             product.productID = productID
 
             uploadImage(images) {
-                product.images = it
+                allImages.addAll(imagesList)
+                product.images = allImages
                 addProductData(product)
                 jobUpload?.cancel()
             }
@@ -176,47 +177,61 @@ class AddProductViewModel @Inject constructor(
 
 
     private var jobUpload: Job? = null
+    private fun uploadImage(
+        imagesUris: List<Uri>,
+        onComplete: () -> Unit
+    ) {
+        val images: MutableList<Uri> = ArrayList()
+        images.addAll(imagesUris)
+        images.removeAt(0)
+
+        imagesList.clear()
+        uploadImages(0, images) {
+            onComplete()
+        }
+    }
+
+    private fun uploadImages(
+        index: Int,
+        imagesUris: List<Uri>,
+        onComplete: () -> Unit
+    ) {
+        val ref = FirebaseStorage.getInstance().reference
+            .child(Calendar.getInstance().timeInMillis.toString())
+        val uploadTask = ref.putFile(imagesUris[index])
+
+        uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
+                    throw it
+                }
+            }
+            ref.downloadUrl
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                if (index == (imagesUris.size - 1)) {
+                    imagesList.add(task.result.toString())
+                    onComplete()
+                } else {
+                    imagesList.add(task.result.toString())
+                    uploadImages(index + 1, imagesUris, onComplete)
+                }
+            } else {
+                _stateAddProduct.value = DataState(error = task.exception?.message.toString())
+            }
+        }.addOnFailureListener {
+            _stateAddProduct.value = DataState(error = it.message.toString())
+        }
+    }
 
     fun resetState() {
         _productDesc.value = false
         _productPrice.value = false
         _subCategoryID.value = false
         _productName.value = false
-
         _stateAddProduct.value = DataState()
         _stateCategories.value = DataState()
         job?.cancel()
         jobUpload?.cancel()
     }
-
-
-    private fun uploadImage(
-        imagesUri: List<Uri>,
-        imagesUploaded: (List<String>) -> Unit
-    ) {
-        try {
-            viewModelScope.launch {
-                val uris: List<String> =
-                    withContext(Dispatchers.IO) {
-                        imagesUri.map { uri ->
-                            async {
-                                FirebaseStorage.getInstance().reference
-                                    .child(Calendar.getInstance().timeInMillis.toString())
-                                    .putFile(uri)
-                                    .await()
-                                    .storage
-                                    .downloadUrl
-                                    .await().toString()
-                            }
-                        }.awaitAll()
-                    }
-                imagesUploaded.invoke(uris)
-            }
-        } catch (e: Exception) {
-            _stateAddProduct.value = DataState(error = e.message.toString())
-
-        }
-
-    }
-
 }

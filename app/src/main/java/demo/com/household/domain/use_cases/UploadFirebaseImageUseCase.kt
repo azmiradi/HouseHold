@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
+import java.util.Calendar
 import javax.inject.Inject
 
 
@@ -16,7 +17,7 @@ class UploadFirebaseImageUseCase @Inject  constructor() {
         try {
             emit(Resource.Loading())
             val downloadUrl = FirebaseStorage.getInstance().reference
-                .child("images")
+                .child("images_"+Calendar.getInstance().timeInMillis)
                 .putFile(imageUri).await()
                 .storage.downloadUrl.await()
             emit(Resource.Success<String>(downloadUrl.toString()))

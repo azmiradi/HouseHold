@@ -111,7 +111,6 @@ class AddProductViewModel @Inject constructor(
         subCategoryID: String,
         images: MutableList<Uri>
     ) {
-        images.removeAt(0)
         validationInputs(
             productName,
             productDescription,
@@ -184,7 +183,6 @@ class AddProductViewModel @Inject constructor(
         val images: MutableList<Uri> = ArrayList()
         images.addAll(imagesUris)
         images.removeAt(0)
-
         imagesList.clear()
         uploadImages(0, images) {
             onComplete()

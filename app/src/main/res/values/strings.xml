@@ -39,7 +39,7 @@
     <string name="add_product">Add product</string>
     <string name="product_name">Product name</string>
     <string name="dicription">Dicription</string>
-    <string name="price">Price</string>
+    <string name="price">Price Ex: 200 KWD</string>
     <string name="select_sub_category">Select Sub Category</string>
     <string name="quntity">Quantity:</string>
     <string name="add_cart">ADD TO CART</string>

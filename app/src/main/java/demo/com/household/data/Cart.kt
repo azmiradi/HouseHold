@@ -6,7 +6,8 @@ data class Cart(
     var time: String? = null,
     var id: String? = null,
     var userName: String? = null,
-    var userID: String? = null
+    var userID: String? = null,
+    var isDeliver:Boolean =false
 ) {
     fun status(): RequestStatus? = RequestStatus.values().find {
         it.status == _status

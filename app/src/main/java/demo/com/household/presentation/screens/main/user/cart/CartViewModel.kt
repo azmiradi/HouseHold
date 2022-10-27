@@ -14,7 +14,9 @@ import demo.com.household.presentation.DataState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
@@ -89,6 +91,40 @@ class CartViewModel @Inject constructor(
     }
 
     fun setRequest() {
+
+    }
+
+
+    fun updateCart() {
+        generalGeneralPrefsStoreImpl.getID().onEach {
+             databaseReference.child(it)
+                .child("Cart")
+                .addListenerForSingleValueEvent(object :ValueEventListener{
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        for (data: DataSnapshot in snapshot.children) {
+                            val cart = data.getValue(Cart::class.java)
+                            if (cart?.status() == RequestStatus.Cart) {
+                                 cart.isDeliver=true
+                                 databaseReference.child(it)
+                                    .child("Cart")
+                                    .child(data.key.toString())
+                                    .setValue(cart)
+                                    .addOnSuccessListener {
+
+                                    }.addOnFailureListener {
+                                     }
+                                return
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+
+                    }
+
+                })
+
+        }.launchIn(viewModelScope)
 
     }
 }

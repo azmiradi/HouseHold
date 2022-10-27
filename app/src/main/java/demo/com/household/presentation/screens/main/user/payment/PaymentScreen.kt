@@ -51,7 +51,6 @@ fun PaymentScreen(
         val cardNum = remember {
             mutableStateOf("")
         }
-
         val prefix = remember {
             mutableStateOf("")
         }
@@ -59,6 +58,7 @@ fun PaymentScreen(
         val month = remember {
             mutableStateOf("")
         }
+
         val year = remember {
             mutableStateOf("")
         }

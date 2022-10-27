@@ -97,6 +97,8 @@ fun MyOrderItem(
                         + totalAmount.toInt())
                     .toString()
         }
+        if (cart.isDeliver)
+            totalAmount=(totalAmount.toInt()+5).toString()
     }
 
     Column(

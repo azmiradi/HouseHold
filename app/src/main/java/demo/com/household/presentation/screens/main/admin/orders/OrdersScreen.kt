@@ -117,6 +117,8 @@ fun OrderItem(
                         + totalAmount.toInt())
                     .toString()
         }
+        if (cart.isDeliver)
+            totalAmount=(totalAmount.toInt()+5).toString()
     }
 
     Card(

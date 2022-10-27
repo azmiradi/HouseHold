@@ -5,7 +5,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -28,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import demo.com.household.R
-import demo.com.household.data.Cart
 import demo.com.household.data.Constants
 import demo.com.household.data.Product
 import demo.com.household.presentation.NavigationDestination
@@ -74,13 +72,16 @@ fun CartScreenScreen(
 
     viewModel.stateDeleteCart.value.data?.let {
         LaunchedEffect(Unit) {
-            totalAmount= "0"
+            totalAmount = "0"
             viewModel.resetState()
             viewModel.getCarts()
         }
     }
     LaunchedEffect(Unit) {
         viewModel.getCarts()
+    }
+    val checkDeliveryDrone = remember {
+        mutableStateOf(false)
     }
 
     Column(
@@ -93,6 +94,33 @@ fun CartScreenScreen(
             onBack = onBack
         )
         Spacer(modifier = Modifier.height(20.dp))
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(end = 16.dp, start = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(colors = CheckboxDefaults.colors(
+                checkmarkColor = Color.White,
+                checkedColor = BrinkPink,
+            ), checked = checkDeliveryDrone.value, onCheckedChange = {
+                checkDeliveryDrone.value = !checkDeliveryDrone.value
+                totalAmount = if (it) {
+                    (totalAmount.toFloat() + 5).toString()
+                } else {
+                    (totalAmount.toFloat() - 5).toString()
+                }
+            })
+            Text(
+                text = "Deliver by Drone",
+                color = Color.Black,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+             )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
 
         LazyColumn(
             Modifier
@@ -150,10 +178,17 @@ fun CartScreenScreen(
                 .fillMaxWidth()
                 .padding(end = 16.dp, start = 16.dp),
             onClick = {
-                if (products.isNotEmpty())
-                {
-                    onNavigate(NavigationDestination.Purchase, totalAmount)
-                    viewModel.resetState()
+
+                if (products.isNotEmpty()) {
+                    if (checkDeliveryDrone.value){
+                        viewModel.updateCart()
+                        onNavigate(NavigationDestination.Purchase, totalAmount)
+                        viewModel.resetState()
+                    }
+                    else{
+                        onNavigate(NavigationDestination.Purchase, totalAmount)
+                        viewModel.resetState()
+                    }
                 }
             },
             colors = ButtonDefaults.buttonColors(BrinkPink),
@@ -171,7 +206,6 @@ fun CartScreenScreen(
 
     }
     HandelResonances()
-
 
 
 }
@@ -226,7 +260,7 @@ fun CartItem(
 
 
             Text(
-                text =" ${cart.price.toString()} ${ Constants.CURRENCY}",
+                text = " ${cart.price.toString()} ${Constants.CURRENCY}",
                 fontWeight = FontWeight.Normal,
                 fontSize = 15.sp,
                 color = Color.Black,
